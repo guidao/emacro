@@ -1,0 +1,13 @@
+#+TITLE: Emacro 一个在emacs中处理文本的mode
+
+* 简介
+emacro 是一个处理重复性的文本工作的mode。使用方式类似于kmacro。不同之处在kmacro的重复性工作是通过录制键盘操作来实现的。而emacro是通过编写代码来实现的。
+
+* 主要函数
+** emacro-start
+在下面打开一个新窗口，给使用者输入 elisp 表达式，表达式被包含在 dash.el 的 =-->= 中。
+** emacro-apply-to-region-lines
+对选中的区域中的每一行都调用以上的 elisp 表达式处理，并将结果替换当前行。
+
+* 示例
+[[file:images/eval.gif]]
