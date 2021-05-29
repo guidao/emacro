@@ -1,0 +1,83 @@
+;;; init-eval.el --- xxxx
+
+
+
+(defvar emacro-last-value "" "last value")
+(defvar emacro-last-elisp-value nil "last elisp value")
+(defvar emacro-join-sep "\n" "join sep when return array value")
+
+
+(defun emacro-start ()
+  (interactive)
+  (let* ((w (split-window-below))
+	 (buf (get-buffer-create "*Edit Eval*")))
+    (select-window w)
+    (switch-to-buffer buf)
+    (erase-buffer)
+    (emacs-lisp-mode)
+    (emacro-mode)
+    (if (string-empty-p emacro-last-value)
+	(insert ";;; edit lisp C-c C-c save to emacro-last-value\n")
+      	(insert emacro-last-value))))
+
+(defun emacro-apply-to-region-lines (top bottom &optional emacro)
+  (interactive "r")
+  (save-excursion
+    (let ((end-marker (copy-marker bottom))
+	  next-line-marker
+	  )
+      (goto-char top)
+      (if (not (bolp))
+	  (forward-line 1))
+      (setq next-line-marker (point-marker))
+      (set-marker-insertion-type next-line-marker t)
+      (while (< next-line-marker end-marker)
+	(goto-char next-line-marker)
+	(save-excursion
+	  (forward-line 1)
+	  (set-marker next-line-marker (point)))
+	(save-excursion
+	  (let ((mark-active nil))
+          (emacro-execute (point) next-line-marker))))
+      (set-marker end-marker nil)
+      (set-marker next-line-marker nil))
+    ))
+
+
+(defmacro emacro-execute (min max)
+  `(let* ((str (buffer-substring-no-properties ,min ,max))
+	  (result ,emacro-last-elisp-value)
+	  )
+     (save-excursion
+       (delete-region ,min ,max)
+       (insert (cond ((stringp result) result)
+		     ((sequencep result) (string-join result emacro-join-sep))
+		     (t (format "%s" result)))))))
+
+
+(defun emacro-save-command ()
+  (interactive)
+  (let ((buf (get-buffer "*Edit Eval*")))
+    (switch-to-buffer buf)
+    (setq emacro-last-value (buffer-string))
+    (setq emacro-last-elisp-value (read (format "(--> str %s)" (buffer-string))))
+    (delete-window)))
+
+
+
+(defvar emacro-mode-map
+  (let ((keymap (make-keymap)))
+    (define-key keymap (kbd "C-c C-c") 'emacro-save-command)
+    keymap))
+
+(define-minor-mode emacro-mode
+  "emacro edit mode"
+  nil
+  " [E]"
+  emacro-mode-map
+  )
+
+(provide 'init-eval)
+
+
+
