@@ -63,13 +63,12 @@
       (set-marker next-line-marker nil))
     ))
 
-
-(defmacro emacro-execute (min max)
-  `(let* ((str (buffer-substring-no-properties ,min ,max))
-	  (result ,emacro-last-elisp-value)
-	  )
+(defun emacro-execute (min max code)
+  (let* ((str (buffer-substring-no-properties min max))
+	 (lexical-binding nil)
+	  (result (eval emacro-last-elisp-value `((str . ,str)))))
      (save-excursion
-       (delete-region ,min ,max)
+       (delete-region min max)
        (insert (cond ((stringp result) result)
 		     ((sequencep result) (string-join result emacro-join-sep))
 		     (t (format "%s" result)))))))
