@@ -58,7 +58,7 @@
 	  (set-marker next-line-marker (point)))
 	(save-excursion
 	  (let ((mark-active nil))
-          (emacro-execute (point) (marker-position next-line-marker)))))
+          (emacro-execute (point) (marker-position next-line-marker) emacro-last-elisp-value))))
       (set-marker end-marker nil)
       (set-marker next-line-marker nil))
     ))
