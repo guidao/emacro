@@ -34,7 +34,7 @@
     (select-window w)
     (switch-to-buffer buf)
     (erase-buffer)
-    (emacs-lisp-mode)
+    (lisp-interaction-mode)
     (emacro-mode)
     (if (string-empty-p emacro-last-value)
 	(insert ";;; edit lisp C-c C-c save to emacro-last-value\n")
