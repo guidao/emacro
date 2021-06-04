@@ -31,7 +31,7 @@
     (select-window w)
     (switch-to-buffer buf)
     (erase-buffer)
-    (emacs-lisp-mode)
+    (lisp-interaction-mode)
     (emacro-mode)
     (if (string-empty-p emacro-last-value)
 	(insert ";;; edit lisp C-c C-c save to emacro-last-value\n")
@@ -55,18 +55,17 @@
 	  (set-marker next-line-marker (point)))
 	(save-excursion
 	  (let ((mark-active nil))
-          (emacro-execute (point) next-line-marker))))
+          (emacro-execute (point) (marker-position next-line-marker) emacro-last-elisp-value))))
       (set-marker end-marker nil)
       (set-marker next-line-marker nil))
     ))
 
-
-(defmacro emacro-execute (min max)
-  `(let* ((str (buffer-substring-no-properties ,min ,max))
-	  (result ,emacro-last-elisp-value)
-	  )
+(defun emacro-execute (min max code)
+  (let* ((str (buffer-substring-no-properties min max))
+	 (lexical-binding nil)
+	  (result (eval emacro-last-elisp-value `((str . ,str)))))
      (save-excursion
-       (delete-region ,min ,max)
+       (delete-region min max)
        (insert (cond ((stringp result) result)
 		     ((sequencep result) (string-join result emacro-join-sep))
 		     (t (format "%s" result)))))))
