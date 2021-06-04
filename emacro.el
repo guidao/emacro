@@ -17,9 +17,6 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
-;;; Commentary:
-;; Implementation for all commands in Meow.
-
 ;;; Code:
 
 (defvar emacro-last-value "" "last value")
