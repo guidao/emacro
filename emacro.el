@@ -61,9 +61,11 @@
     ))
 
 (defun emacro-execute (min max code)
-  (let* ((str (buffer-substring-no-properties min max))
+  (let* ((str (s-trim (buffer-substring-no-properties min max)))
 	 (lexical-binding nil)
-	  (result (eval emacro-last-elisp-value `((str . ,str)))))
+	 (result (eval emacro-last-elisp-value `((str . ,str))))
+	 (result (s-concat result "\n"))
+	 )
      (save-excursion
        (delete-region min max)
        (insert (cond ((stringp result) result)
