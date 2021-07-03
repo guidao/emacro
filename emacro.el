@@ -64,13 +64,13 @@
   (let* ((str (s-trim (buffer-substring-no-properties min max)))
 	 (lexical-binding nil)
 	 (result (eval emacro-last-elisp-value `((str . ,str))))
-	 (result (s-concat result "\n"))
 	 )
      (save-excursion
        (delete-region min max)
        (insert (cond ((stringp result) result)
 		     ((sequencep result) (string-join result emacro-join-sep))
-		     (t (format "%s" result)))))))
+		     (t (format "%s" result))))
+       (insert "\n"))))
 
 
 (defun emacro-save-command ()
