@@ -22,12 +22,13 @@
 
 ;;; Code:
 
-(defvar emacro-last-value "" "last value")
-(defvar emacro-last-elisp-value nil "last elisp value")
-(defvar emacro-join-sep "\n" "join sep when return array value")
+(defvar emacro-last-value "" "Last value.")
+(defvar emacro-last-elisp-value nil "Last elisp value.")
+(defvar emacro-join-sep "\n" "Join sep when return array value.")
 
 
 (defun emacro-start ()
+  "Open a buffer for edit elisp code."
   (interactive)
   (let* ((w (split-window-below))
 	 (buf (get-buffer-create "*Edit Eval*")))
@@ -41,6 +42,7 @@
       	(insert emacro-last-value))))
 
 (defun emacro-apply-to-region-lines (top bottom &optional emacro)
+  "Apply lines to elisp code, TOP and BOTTOM is region, EMACRO is option code."
   (interactive "r")
   (save-excursion
     (let ((end-marker (copy-marker bottom))
@@ -75,12 +77,37 @@
 
 
 (defun emacro-save-command ()
+  "Save elisp code."
   (interactive)
   (let ((buf (get-buffer "*Edit Eval*")))
     (switch-to-buffer buf)
     (setq emacro-last-value (buffer-string))
     (setq emacro-last-elisp-value (read (format "(--> str %s)" (buffer-string))))
     (delete-window)))
+
+
+(defun emacro-match-string-all (regex str)
+  "Return all match REGEX string in STR."
+  (save-match-data
+    (let ((all-strings ())
+	  (i 0))
+      (while (and (< i (length str))
+		  (string-match regex str i))
+	(setq i (1+ (match-end 0)))
+	(let (strings
+	      (num-matchs (/ (length (match-data)) 2))
+	      (match 0))
+	  (while (/= match num-matchs)
+	    (push (match-string match str) strings)
+	    (setq match (1+ match)))
+	  (push (nreverse strings) all-strings)))
+      (nreverse all-strings))))
+
+(defun emacro-apply-to-region (top bottom)
+  "Apply code on region, TOP and BOTTOM is region pos."
+  (interactive "r")
+  (emacro-execute top bottom emacro-last-elisp-value))
+
 
 
 
